@@ -26,10 +26,13 @@ CSV_FIELDS = [
     "video_id",
     "title",
     "published_at",
+    "views",
+    "likes",
+    "comments",
+    "thumbnail_url",
+    "tags",
+    "description",
     "url",
-    "view_count",
-    "like_count",
-    "comment_count",
 ]
 
 
@@ -60,7 +63,15 @@ def read_csv_rows(path: Path = CSV_PATH) -> list[dict[str, str]]:
         return []
 
     with path.open("r", encoding="utf-8", newline="") as f:
-        return list(csv.DictReader(f))
+        return [normalize_row(row) for row in csv.DictReader(f)]
+
+
+def normalize_row(row: dict[str, str]) -> dict[str, str]:
+    normalized = dict(row)
+    normalized["views"] = normalized.get("views") or normalized.get("view_count", "")
+    normalized["likes"] = normalized.get("likes") or normalized.get("like_count", "")
+    normalized["comments"] = normalized.get("comments") or normalized.get("comment_count", "")
+    return normalized
 
 
 def write_csv_rows(rows: Iterable[dict[str, str]], path: Path = CSV_PATH) -> None:

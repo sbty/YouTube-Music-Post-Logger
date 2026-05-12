@@ -64,6 +64,7 @@ def build_csv_rows(items: list[dict[str, Any]], snapshot_date: str) -> list[dict
         video_id = item.get("id", "")
         snippet = item.get("snippet", {})
         statistics = item.get("statistics", {})
+        thumbnails = snippet.get("thumbnails", {})
         if not video_id:
             continue
 
@@ -73,13 +74,24 @@ def build_csv_rows(items: list[dict[str, Any]], snapshot_date: str) -> list[dict
                 "video_id": video_id,
                 "title": snippet.get("title", ""),
                 "published_at": snippet.get("publishedAt", ""),
+                "views": statistics.get("viewCount", "0"),
+                "likes": statistics.get("likeCount", "0"),
+                "comments": statistics.get("commentCount", "0"),
+                "thumbnail_url": get_thumbnail_url(thumbnails),
+                "tags": ";".join(snippet.get("tags", [])),
+                "description": snippet.get("description", ""),
                 "url": f"https://www.youtube.com/watch?v={video_id}",
-                "view_count": statistics.get("viewCount", "0"),
-                "like_count": statistics.get("likeCount", "0"),
-                "comment_count": statistics.get("commentCount", "0"),
             }
         )
     return rows
+
+
+def get_thumbnail_url(thumbnails: dict[str, Any]) -> str:
+    for size in ("maxres", "standard", "high", "medium", "default"):
+        thumbnail = thumbnails.get(size)
+        if thumbnail and thumbnail.get("url"):
+            return thumbnail["url"]
+    return ""
 
 
 def main() -> None:

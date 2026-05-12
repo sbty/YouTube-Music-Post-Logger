@@ -41,9 +41,9 @@ def main() -> None:
 def build_report(rows: list[dict[str, str]], start_date: str, end_date: str) -> str:
     latest_rows = latest_rows_by_video(rows)
     pairs = first_last_rows_by_video(rows)
-    total_views = sum(int_value(row, "view_count") for row in latest_rows)
-    total_likes = sum(int_value(row, "like_count") for row in latest_rows)
-    total_comments = sum(int_value(row, "comment_count") for row in latest_rows)
+    total_views = sum(int_value(row, "views") for row in latest_rows)
+    total_likes = sum(int_value(row, "likes") for row in latest_rows)
+    total_comments = sum(int_value(row, "comments") for row in latest_rows)
 
     growth_rows = []
     for video_id, (first, last) in pairs.items():
@@ -51,9 +51,9 @@ def build_report(rows: list[dict[str, str]], start_date: str, end_date: str) -> 
             {
                 "title": last.get("title", ""),
                 "url": last.get("url", ""),
-                "view_growth": int_value(last, "view_count") - int_value(first, "view_count"),
-                "like_growth": int_value(last, "like_count") - int_value(first, "like_count"),
-                "comment_growth": int_value(last, "comment_count") - int_value(first, "comment_count"),
+                "view_growth": int_value(last, "views") - int_value(first, "views"),
+                "like_growth": int_value(last, "likes") - int_value(first, "likes"),
+                "comment_growth": int_value(last, "comments") - int_value(first, "comments"),
             }
         )
     growth_rows.sort(key=lambda row: row["view_growth"], reverse=True)
